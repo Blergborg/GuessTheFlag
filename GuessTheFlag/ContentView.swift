@@ -16,6 +16,9 @@ struct ContentView: View {
     
     @State private var showingScore = false
     @State private var scoreTitle = ""
+    @State private var score = 0
+    @State private var questionsRemaining = 8
+    @State private var gameOver = false
     
     var body: some View {
         ZStack {
@@ -54,7 +57,12 @@ struct ContentView: View {
                     .alert(scoreTitle, isPresented: $showingScore) {
                         Button("Continue", action: askQuestion)
                     } message: {
-                        Text("Your score is: ???")
+                        Text("Your score is: \(score)")
+                    }
+                    .alert("Final Score", isPresented: $gameOver) {
+                        Button("Reset", action: reset)
+                    } message: {
+                        Text("Your score is: \(score)")
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -65,7 +73,7 @@ struct ContentView: View {
                 Spacer()
                 Spacer()
                 
-                Text("Score: ???")
+                Text("Score: \(score)")
                     .foregroundColor(.white)
                     .font(.title.bold())
                 
@@ -76,18 +84,32 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        questionsRemaining -= 1
+        
         if number == correctAnswer {
             scoreTitle = "Correct"
+            score += 10
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong! That's the flag of \(countries[correctAnswer])"
+            score -= 10
         }
-        
-        showingScore = true
+        if questionsRemaining == 0 {
+            showingScore = false
+            gameOver = true
+        } else {
+            showingScore = true
+        }
     }
     
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+    
+    func reset() {
+        askQuestion()
+        score = 0
+        questionsRemaining = 8
     }
 }
 
