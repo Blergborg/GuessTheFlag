@@ -90,7 +90,7 @@ struct ContentView: View {
             scoreTitle = "Correct"
             score += 10
         } else {
-            scoreTitle = "Wrong! That's the flag of \(countries[correctAnswer])"
+            scoreTitle = "Wrong! That's the flag of \(countries[number])"
             score -= 10
         }
         if questionsRemaining == 0 {
@@ -107,9 +107,10 @@ struct ContentView: View {
     }
     
     func reset() {
-        askQuestion()
+        gameOver = false
         score = 0
         questionsRemaining = 8
+        askQuestion()
     }
 }
 
