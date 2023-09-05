@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
     
     @State private var correctAnswer = Int.random(in: 0...2)
+    @State private var selectedAnswer: Int? = nil
     
     @State private var showingScore = false
     @State private var scoreTitle = ""
@@ -40,19 +41,23 @@ struct ContentView: View {
                             .font(.subheadline.weight(.heavy))
                         Text(countries[correctAnswer])
                             .font(.largeTitle.weight(.semibold))
-                        
                     }
                     
                     
                     ForEach(0..<3) { number in
                         Button {
-                            flagTapped(number)
+                            withAnimation() {
+                                flagTapped(number)
+                            }
                         } label: {
                             Image(countries[number])
                                 .renderingMode(.original)
                                 .clipShape(Capsule())
                                 .shadow(radius: 5)
                         }
+                        .rotationEffect( selectedAnswer == number ? .degrees(360) : .degrees(0))
+                        .opacity(selectedAnswer != nil && selectedAnswer != number ? 0.25 : 1.0)
+                        .scaleEffect(selectedAnswer != nil && selectedAnswer != number ? 0.8 : 1.0)
                     }
                     .alert(scoreTitle, isPresented: $showingScore) {
                         Button("Continue", action: askQuestion)
@@ -84,7 +89,9 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        
         questionsRemaining -= 1
+        selectedAnswer = number
         
         if number == correctAnswer {
             scoreTitle = "Correct"
@@ -104,6 +111,7 @@ struct ContentView: View {
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        selectedAnswer = nil
     }
     
     func reset() {
